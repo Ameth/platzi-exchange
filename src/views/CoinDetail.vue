@@ -1,6 +1,10 @@
 <template>
   <div class="flex-col">
-    <template v-if="asset.id">
+    <div class="flex justify-center">
+      <bounce-loader :loading="isLoading" :color="'#68d391'" :size="100"></bounce-loader>
+    </div>
+
+    <template v-if="!isLoading">
       <div class="flex flex-col sm:flex-row justify-around items-center">
         <div class="flex flex-col items-center">
           <img :src="`https://static.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`" :alt="asset.name"
@@ -53,6 +57,10 @@
           <span class="text-xl"></span>
         </div>
       </div>
+
+      <line-chart class="my-10" :colors="['orange']" :min="min" :max="max"
+        :data="history.map(item => [item.date, parseFloat(item.priceUsd).toFixed(2)])" />
+
     </template>
   </div>
 </template>
@@ -65,6 +73,7 @@ export default {
   name: 'CoinDetail',
   data() {
     return {
+      isLoading: false,
       asset: {},
       history: []
     }
@@ -98,14 +107,18 @@ export default {
 
   methods: {
     getCoin() {
+      this.isLoading = true
+
       const id = this.$route.params.id
       Promise.all([
         api.getAsset(id),
         api.getAssetHistory(id)
-      ]).then(([asset, history]) => {
-        this.asset = asset
-        this.history = history
-      })
+      ])
+        .then(([asset, history]) => {
+          this.asset = asset
+          this.history = history
+        })
+        .finally(() => this.isLoading = false)
     }
   },
 }
