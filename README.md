@@ -1,5 +1,9 @@
 # platzi-exchange
 
+You can see the finished project on Netlify
+
+[https://platzi-exchange-ameth.netlify.app/](https://platzi-exchange-ameth.netlify.app/ "https://platzi-exchange-ameth.netlify.app/")
+
 ## Project setup
 ```
 npm install
@@ -22,3 +26,5 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+ Made with love and sweat 💓💪
