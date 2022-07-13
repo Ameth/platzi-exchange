@@ -1,8 +1,8 @@
 <template>
   <div class="flex-col">
-    <div class="flex justify-center">
+    <!-- <div class="flex justify-center">
       <bounce-loader :loading="isLoading" :color="'#68d391'" :size="100"></bounce-loader>
-    </div>
+    </div> -->
 
     <template v-if="!isLoading">
       <div class="flex flex-col sm:flex-row justify-around items-center">
@@ -61,21 +61,45 @@
       <line-chart class="my-10" :colors="['orange']" :min="min" :max="max"
         :data="history.map(item => [item.date, parseFloat(item.priceUsd).toFixed(2)])" />
 
+      <h3 class="text-xl my-10">Mejores Ofertas de Cambio</h3>
+      <table>
+        <tr v-for="market in markets" :key="`${market.exchangeId}-${market.priceUsd}`" class="border-b">
+          <td>
+            <b>{{ market.exchangeId }}</b>
+          </td>
+          <td>{{ dollarFilter(market.priceUsd) }}</td>
+          <td>{{ market.baseSymbol }} / {{ market.quoteSymbol }}</td>
+          <td>
+            <button-component v-if="!market.url" @ir-a-detalle="getWebSite(market)">
+              <span>Obtener link</span>
+            </button-component>
+            <a v-else class="hover:underline text-green-600" target="_blank" :href="`${market.url}`">
+              {{ market.url }}
+            </a>
+          </td>
+        </tr>
+      </table>
+
     </template>
   </div>
 </template>
 
 <script>
 import api from '@/api'
+import ButtonComponent from '@/components/ButtonComponent'
 import { dollarFilter, percentFilter } from '@/filters'
 
 export default {
   name: 'CoinDetail',
+  components: {
+    ButtonComponent
+  },
   data() {
     return {
       isLoading: false,
       asset: {},
-      history: []
+      history: [],
+      markets: []
     }
   },
 
@@ -106,17 +130,24 @@ export default {
   },
 
   methods: {
+    getWebSite(market) {
+      return api.getExchange(market.exchangeId).then(res => {
+        market.url = res.exchangeUrl
+      })
+    },
     getCoin() {
       this.isLoading = true
 
       const id = this.$route.params.id
       Promise.all([
         api.getAsset(id),
-        api.getAssetHistory(id)
+        api.getAssetHistory(id),
+        api.getMarkets(id)
       ])
-        .then(([asset, history]) => {
+        .then(([asset, history, markets]) => {
           this.asset = asset
           this.history = history
+          this.markets = markets
         })
         .finally(() => this.isLoading = false)
     }
