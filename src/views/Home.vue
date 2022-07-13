@@ -1,6 +1,6 @@
 <template>
   <div>
-    <bounce-loader :loading="isLoading" :color="'#68d391'" :size="100"></bounce-loader>
+    <!-- <bounce-loader :loading="isLoading" :color="'#68d391'" :size="100"></bounce-loader> -->
     <assets-table-component v-if="!isLoading" :lista="assets" />
   </div>
 </template>
